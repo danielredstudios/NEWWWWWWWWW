@@ -31,9 +31,10 @@ Public Class frmAdminDashboard
 
         RefreshAllData()
 
-        tmrRefresh.Interval = 15000
-        AddHandler tmrRefresh.Tick, AddressOf tmrRefresh_Tick
-        tmrRefresh.Start()
+        ' Auto-refresh disabled per user request
+        ' tmrRefresh.Interval = 15000
+        ' AddHandler tmrRefresh.Tick, AddressOf tmrRefresh_Tick
+        ' tmrRefresh.Start()
 
 
         cboSortQueueLogs.Items.Clear()
@@ -905,7 +906,7 @@ Public Class frmAdminDashboard
                     End Using
                 End Using
             Catch ex As Exception
-                Console.WriteLine($"Error fetching processed queue counts: {ex.Message}")
+                MessageBox.Show($"Error fetching processed queue counts: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Using
 
