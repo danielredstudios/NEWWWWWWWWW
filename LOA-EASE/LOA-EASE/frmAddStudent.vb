@@ -183,7 +183,6 @@ Public Class frmAddStudent
                               MessageBoxButtons.OK,
                               MessageBoxIcon.Information)
                 Me.DialogResult = DialogResult.OK
-                Me.Close()
             Else
                 MessageBox.Show("Failed to add student." & vbCrLf &
                               "The student number or email might already exist.",

@@ -267,7 +267,6 @@ Public Class frmBulkAddStudents
                               MessageBoxButtons.OK,
                               MessageBoxIcon.Information)
                 Me.DialogResult = DialogResult.OK
-                Me.Close()
             Else
                 MessageBox.Show($"{successCount} student(s) were added successfully." & vbCrLf &
                               $"{failCount} student(s) could not be added because they may already exist:" & vbCrLf & vbCrLf &
@@ -279,7 +278,6 @@ Public Class frmBulkAddStudents
                 
                 If successCount > 0 Then
                     Me.DialogResult = DialogResult.OK
-                    Me.Close()
                 End If
             End If
         Catch ex As Exception
