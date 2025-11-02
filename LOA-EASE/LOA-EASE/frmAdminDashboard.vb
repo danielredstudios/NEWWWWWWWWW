@@ -894,10 +894,11 @@ Public Class frmAdminDashboard
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
                 conn.Open()
-                Dim query As String = "SELECT cashier_id, COUNT(*) as ProcessedCount 
-                                      FROM queues 
-                                      WHERE status = 'completed' AND DATE(created_at) = CURDATE() 
-                                      GROUP BY cashier_id"
+                Dim query As String = "SELECT c.cashier_id, COUNT(*) as ProcessedCount 
+                                      FROM queues q
+                                      JOIN cashiers c ON q.counter_id = c.counter_id
+                                      WHERE q.status = 'completed' AND DATE(q.created_at) = CURDATE() 
+                                      GROUP BY c.cashier_id"
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                         While reader.Read()
@@ -1367,7 +1368,7 @@ Public Class frmAdminDashboard
                     FROM queues q
                     LEFT JOIN students s ON q.student_id = s.student_id
                     LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
-                    LEFT JOIN cashiers c ON q.cashier_id = c.cashier_id
+                    LEFT JOIN cashiers c ON q.counter_id = c.counter_id
                     WHERE ")
 
                 Dim cmd As New MySqlCommand()
