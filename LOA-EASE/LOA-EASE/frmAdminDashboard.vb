@@ -1614,8 +1614,8 @@ Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellF
 
         If e.ColumnIndex = dgvCashiers.Columns("ProcessedToday").Index Then
             If TypeOf e.Value Is Integer AndAlso CInt(e.Value) = 0 Then
-                e.Value = "Default"
                 e.CellStyle.ForeColor = Color.Gray
+                e.CellStyle.Format = "0"
             Else
                 e.CellStyle.ForeColor = Color.Black
                 e.CellStyle.Format = "N0"
