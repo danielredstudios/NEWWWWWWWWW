@@ -29,7 +29,6 @@ Partial Class frmLogin
         pnlLoginContainer = New Panel()
         pnlAttempts = New Panel()
         lblAttemptsInfo = New Label()
-        lblForgotPassword = New Label()
         chkShowPassword = New CheckBox()
         btnLogin = New Button()
         pnlPasswordContainer = New Panel()
@@ -146,7 +145,6 @@ Partial Class frmLogin
         pnlLoginContainer.Anchor = AnchorStyles.None
         pnlLoginContainer.BackColor = Color.White
         pnlLoginContainer.Controls.Add(pnlAttempts)
-        pnlLoginContainer.Controls.Add(lblForgotPassword)
         pnlLoginContainer.Controls.Add(chkShowPassword)
         pnlLoginContainer.Controls.Add(btnLogin)
         pnlLoginContainer.Controls.Add(pnlPasswordContainer)
@@ -179,18 +177,6 @@ Partial Class frmLogin
         lblAttemptsInfo.TabIndex = 0
         lblAttemptsInfo.Text = "⚠ 2 attempts remaining"
         lblAttemptsInfo.TextAlign = ContentAlignment.MiddleCenter
-        ' 
-        ' lblForgotPassword
-        ' 
-        lblForgotPassword.AutoSize = True
-        lblForgotPassword.Cursor = Cursors.Hand
-        lblForgotPassword.Font = New Font("Poppins", 8.25F)
-        lblForgotPassword.ForeColor = Color.FromArgb(CByte(13), CByte(71), CByte(161))
-        lblForgotPassword.Location = New Point(30, 305)
-        lblForgotPassword.Name = "lblForgotPassword"
-        lblForgotPassword.Size = New Size(105, 19)
-        lblForgotPassword.TabIndex = 6
-        lblForgotPassword.Text = "Forgot Password?"
         ' 
         ' chkShowPassword
         ' 
@@ -383,7 +369,6 @@ Partial Class frmLogin
     Friend WithEvents txtPassword As TextBox
     Friend WithEvents btnLogin As Button
     Friend WithEvents chkShowPassword As CheckBox
-    Friend WithEvents lblForgotPassword As Label
     Friend WithEvents pnlAttempts As Panel
     Friend WithEvents lblAttemptsInfo As Label
     Friend WithEvents pnlStatusBar As Panel

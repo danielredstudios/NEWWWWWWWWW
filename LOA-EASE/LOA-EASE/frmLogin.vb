@@ -424,13 +424,6 @@ Public Class frmLogin
         txtPassword.UseSystemPasswordChar = Not chkShowPassword.Checked
     End Sub
 
-    Private Sub lblForgotPassword_Click(sender As Object, e As EventArgs) Handles lblForgotPassword.Click
-        MessageBox.Show("Please contact your system administrator to reset your password." & vbCrLf & vbCrLf &
-                      "Administrator Email: admin@loaease.edu" & vbCrLf &
-                      "Support Hotline: (02) 8123-4567",
-                      "Password Reset", MessageBoxButtons.OK, MessageBoxIcon.Information)
-    End Sub
-
     Private Sub txtUsername_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtUsername.KeyPress
         If e.KeyChar = ChrW(Keys.Enter) Then
             e.Handled = True
@@ -455,14 +448,6 @@ Public Class frmLogin
 
     Private Sub btnLogin_MouseLeave(sender As Object, e As EventArgs) Handles btnLogin.MouseLeave
         btnLogin.BackColor = Color.FromArgb(CByte(13), CByte(71), CByte(161))
-    End Sub
-
-    Private Sub lblForgotPassword_MouseEnter(sender As Object, e As EventArgs) Handles lblForgotPassword.MouseEnter
-        lblForgotPassword.Font = New Font(lblForgotPassword.Font, FontStyle.Underline)
-    End Sub
-
-    Private Sub lblForgotPassword_MouseLeave(sender As Object, e As EventArgs) Handles lblForgotPassword.MouseLeave
-        lblForgotPassword.Font = New Font(lblForgotPassword.Font, FontStyle.Regular)
     End Sub
 
     Protected Overrides Sub OnFormClosing(e As FormClosingEventArgs)
