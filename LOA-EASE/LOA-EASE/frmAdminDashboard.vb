@@ -893,15 +893,16 @@ Public Class frmAdminDashboard
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
                 conn.Open()
-                Dim query As String = "SELECT c.cashier_id, COUNT(*) as ProcessedCount 
-                                      FROM queues q
-                                      JOIN cashiers c ON q.counter_id = c.counter_id
-                                      WHERE q.status = 'completed' AND DATE(q.created_at) = CURDATE() 
-                                      GROUP BY c.cashier_id"
+                Dim query As String = "SELECT counter_id, COUNT(*) as ProcessedCount 
+                                      FROM queues 
+                                      WHERE status = 'completed' AND DATE(created_at) = CURDATE() 
+                                      GROUP BY counter_id"
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                         While reader.Read()
-                            processedCounts.Add(Convert.ToInt32(reader("cashier_id")), Convert.ToInt32(reader("ProcessedCount")))
+                            If Not reader.IsDBNull(reader.GetOrdinal("counter_id")) Then
+                                processedCounts.Add(Convert.ToInt32(reader("counter_id")), Convert.ToInt32(reader("ProcessedCount")))
+                            End If
                         End While
                     End Using
                 End Using
@@ -915,7 +916,7 @@ Public Class frmAdminDashboard
             Try
                 conn.Open()
                 Dim query As String = "
-                        SELECT csh.cashier_id, csh.full_name, csh.username, csh.last_login
+                        SELECT csh.cashier_id, csh.counter_id, csh.full_name, csh.username, csh.last_login
                         FROM cashiers csh
                         ORDER BY csh.full_name"
                 Using cmd As New MySqlCommand(query, conn)
@@ -923,8 +924,12 @@ Public Class frmAdminDashboard
                         While reader.Read()
                             Dim cashierId As Integer = Convert.ToInt32(reader("cashier_id"))
                             Dim processedToday As Integer = 0
-                            If processedCounts.ContainsKey(cashierId) Then
-                                processedToday = processedCounts(cashierId)
+                            
+                            If Not reader.IsDBNull(reader.GetOrdinal("counter_id")) Then
+                                Dim counterId As Integer = Convert.ToInt32(reader("counter_id"))
+                                If processedCounts.ContainsKey(counterId) Then
+                                    processedToday = processedCounts(counterId)
+                                End If
                             End If
 
                             cashierList.Add(New StaffUser With {
