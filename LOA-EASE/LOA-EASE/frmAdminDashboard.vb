@@ -31,11 +31,6 @@ Public Class frmAdminDashboard
 
         RefreshAllData()
 
-        ' Auto-refresh disabled per user request
-        ' tmrRefresh.Interval = 15000
-        ' AddHandler tmrRefresh.Tick, AddressOf tmrRefresh_Tick
-        ' tmrRefresh.Start()
-
 
         cboSortQueueLogs.Items.Clear()
         cboSortQueueLogs.Items.Add("Default")
