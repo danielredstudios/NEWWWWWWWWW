@@ -1553,6 +1553,10 @@ Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellF
             Using frm As New frmAddStudent()
                 frm.ShowDialog(Me)
                 If frm.DialogResult = DialogResult.OK Then
+                    MessageBox.Show("Student added successfully!",
+                                  "Success",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Information)
                     FetchUsers()
                 End If
             End Using
@@ -1567,6 +1571,10 @@ Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellF
             Using frm As New frmBulkAddStudents()
                 frm.ShowDialog(Me)
                 If frm.DialogResult = DialogResult.OK Then
+                    MessageBox.Show("Students added successfully!",
+                                  "Success",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Information)
                     FetchUsers()
                 End If
             End Using
