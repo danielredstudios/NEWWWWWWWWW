@@ -283,7 +283,6 @@ Public Class frmAdminDashboard
         AddHandler txtSearchCashiers.TextChanged, AddressOf txtSearchCashiers_TextChanged
         AddHandler dgvCashiers.CellFormatting, AddressOf dgvCashiers_CellFormatting
 
-        ' Add handlers for the new DataError events
         AddHandler dgvAdmins.DataError, AddressOf dgvAdmins_DataError
         AddHandler dgvCashiers.DataError, AddressOf dgvCashiers_DataError
 
@@ -1615,8 +1614,8 @@ Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellF
 
         If e.ColumnIndex = dgvCashiers.Columns("ProcessedToday").Index Then
             If TypeOf e.Value Is Integer AndAlso CInt(e.Value) = 0 Then
+                e.Value = "Default"
                 e.CellStyle.ForeColor = Color.Gray
-                e.CellStyle.Format = "0"
             Else
                 e.CellStyle.ForeColor = Color.Black
                 e.CellStyle.Format = "N0"
@@ -1625,18 +1624,13 @@ Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellF
         End If
     End Sub
 
-    ' Add these two methods here:
     Private Sub dgvAdmins_DataError(sender As Object, e As DataGridViewDataErrorEventArgs)
-        ' Handle data errors for the admins DataGridView
         Console.WriteLine($"DataGridView Admins Error: {e.Exception.Message}")
-        ' Suppress the error to prevent the application from crashing
         e.ThrowException = False
     End Sub
 
     Private Sub dgvCashiers_DataError(sender As Object, e As DataGridViewDataErrorEventArgs)
-        ' Handle data errors for the cashiers DataGridView
         Console.WriteLine($"DataGridView Cashiers Error: {e.Exception.Message}")
-        ' Suppress the error to prevent the application from crashing
         e.ThrowException = False
     End Sub
 End Class
