@@ -94,7 +94,6 @@ Public Class frmAdminDashboard
             .Margin = New Padding(3, 3, 3, 3)
         }
         btnAddNewStudent.FlatAppearance.BorderSize = 0
-        AddHandler btnAddNewStudent.Click, AddressOf btnAddNewStudent_Click
 
         btnBulkAddStudents = New Button() With {
             .Name = "btnBulkAddStudents",
@@ -109,7 +108,6 @@ Public Class frmAdminDashboard
             .Margin = New Padding(3, 3, 3, 3)
         }
         btnBulkAddStudents.FlatAppearance.BorderSize = 0
-        AddHandler btnBulkAddStudents.Click, AddressOf btnBulkAddStudents_Click
 
         btnDeleteStudent = New Button() With {
             .Name = "btnDeleteStudent",
