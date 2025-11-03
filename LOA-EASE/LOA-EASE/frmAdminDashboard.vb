@@ -577,8 +577,14 @@ Public Class frmAdminDashboard
                 Dim query As String = "
                         SELECT
                             q.queue_number,
-                            COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
-                        s.student_number AS StudentNo,
+                            CASE 
+                                WHEN q.visitor_id IS NOT NULL THEN v.full_name
+                                ELSE CONCAT(s.first_name, ' ', s.last_name)
+                            END AS FullName,
+                        CASE 
+                            WHEN q.visitor_id IS NOT NULL THEN 'VISITOR'
+                            ELSE s.student_number
+                        END AS StudentNo,
                         c.counter_name,
                         q.status
                     FROM queues q
@@ -593,7 +599,7 @@ Public Class frmAdminDashboard
                             queueList.Add(New QueueLogItem With {
                                 .QueueNumber = reader("queue_number").ToString(),
                                 .FullName = reader("FullName").ToString(),
-                                .StudentNo = If(reader("StudentNo") IsNot DBNull.Value, reader("StudentNo").ToString(), "N/A"),
+                                .StudentNo = If(reader("StudentNo") IsNot DBNull.Value, reader("StudentNo").ToString(), "VISITOR"),
                                 .Counter = reader("counter_name").ToString(),
                                 .Status = reader("status").ToString()
                             })
@@ -618,7 +624,10 @@ Public Class frmAdminDashboard
                 SELECT
                     q.queue_id,
                     q.queue_number AS 'Queue Number',
-                    COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS 'Full Name',
+                    CASE 
+                        WHEN q.visitor_id IS NOT NULL THEN v.full_name
+                        ELSE CONCAT(s.first_name, ' ', s.last_name)
+                    END AS 'Full Name',
                     q.status AS 'Status',
                     q.created_at AS 'Date Created'
                 FROM queues q
@@ -1360,7 +1369,10 @@ Public Class frmAdminDashboard
                 conn.Open()
                 Dim queryBuilder As New System.Text.StringBuilder("
                     SELECT q.queue_id, q.queue_number,
-                           COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
+                           CASE 
+                               WHEN q.visitor_id IS NOT NULL THEN v.full_name
+                               ELSE CONCAT(s.first_name, ' ', s.last_name)
+                           END AS FullName,
                            q.status, q.created_at,
                            c.full_name AS CashierName
                     FROM queues q
