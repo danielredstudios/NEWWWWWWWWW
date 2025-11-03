@@ -262,24 +262,24 @@ Public Class frmBulkAddStudents
             Next
 
             If failCount = 0 Then
-                MessageBox.Show($"Great! All {successCount} student(s) have been added successfully!",
-                              "Students Added",
-                              MessageBoxButtons.OK,
-                              MessageBoxIcon.Information)
                 Me.DialogResult = DialogResult.OK
-                Me.Close()
             Else
-                MessageBox.Show($"{successCount} student(s) were added successfully." & vbCrLf &
-                              $"{failCount} student(s) could not be added because they may already exist:" & vbCrLf & vbCrLf &
-                              String.Join(vbCrLf, failedEntries.Take(MAX_ERRORS_TO_DISPLAY)) &
-                              If(failedEntries.Count > MAX_ERRORS_TO_DISPLAY, vbCrLf & $"... and {failedEntries.Count - MAX_ERRORS_TO_DISPLAY} more", ""),
-                              "Some Students Already Exist",
-                              MessageBoxButtons.OK,
-                              MessageBoxIcon.Warning)
-                
                 If successCount > 0 Then
+                    MessageBox.Show($"{successCount} student(s) were added successfully." & vbCrLf &
+                                  $"{failCount} student(s) could not be added because they may already exist:" & vbCrLf & vbCrLf &
+                                  String.Join(vbCrLf, failedEntries.Take(MAX_ERRORS_TO_DISPLAY)) &
+                                  If(failedEntries.Count > MAX_ERRORS_TO_DISPLAY, vbCrLf & $"... and {failedEntries.Count - MAX_ERRORS_TO_DISPLAY} more", ""),
+                                  "Partial Success",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Warning)
                     Me.DialogResult = DialogResult.OK
-                    Me.Close()
+                Else
+                    MessageBox.Show($"None of the students could be added. They may already exist:" & vbCrLf & vbCrLf &
+                                  String.Join(vbCrLf, failedEntries.Take(MAX_ERRORS_TO_DISPLAY)) &
+                                  If(failedEntries.Count > MAX_ERRORS_TO_DISPLAY, vbCrLf & $"... and {failedEntries.Count - MAX_ERRORS_TO_DISPLAY} more", ""),
+                                  "All Failed",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Error)
                 End If
             End If
         Catch ex As Exception

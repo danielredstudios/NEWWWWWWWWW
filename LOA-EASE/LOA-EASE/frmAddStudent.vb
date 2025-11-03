@@ -173,17 +173,7 @@ Public Class frmAddStudent
             )
 
             If success Then
-                MessageBox.Show("Student added successfully!" & vbCrLf & vbCrLf &
-                              "Name: " & txtFirstName.Text.Trim() & " " & txtLastName.Text.Trim() & vbCrLf &
-                              "Student No: " & txtStudentNo.Text.Trim() & vbCrLf &
-                              "Email: " & txtEmail.Text.Trim() & vbCrLf &
-                              "Department: " & cboDepartment.SelectedItem.ToString() & vbCrLf &
-                              "Course: " & cboCourse.SelectedItem.ToString(),
-                              "Success",
-                              MessageBoxButtons.OK,
-                              MessageBoxIcon.Information)
                 Me.DialogResult = DialogResult.OK
-                Me.Close()
             Else
                 MessageBox.Show("Failed to add student." & vbCrLf &
                               "The student number or email might already exist.",

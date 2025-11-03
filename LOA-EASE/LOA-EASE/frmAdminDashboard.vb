@@ -31,10 +31,6 @@ Public Class frmAdminDashboard
 
         RefreshAllData()
 
-        tmrRefresh.Interval = 15000
-        AddHandler tmrRefresh.Tick, AddressOf tmrRefresh_Tick
-        tmrRefresh.Start()
-
 
         cboSortQueueLogs.Items.Clear()
         cboSortQueueLogs.Items.Add("Default")
@@ -94,7 +90,6 @@ Public Class frmAdminDashboard
             .Margin = New Padding(3, 3, 3, 3)
         }
         btnAddNewStudent.FlatAppearance.BorderSize = 0
-        AddHandler btnAddNewStudent.Click, AddressOf btnAddNewStudent_Click
 
         btnBulkAddStudents = New Button() With {
             .Name = "btnBulkAddStudents",
@@ -109,7 +104,6 @@ Public Class frmAdminDashboard
             .Margin = New Padding(3, 3, 3, 3)
         }
         btnBulkAddStudents.FlatAppearance.BorderSize = 0
-        AddHandler btnBulkAddStudents.Click, AddressOf btnBulkAddStudents_Click
 
         btnDeleteStudent = New Button() With {
             .Name = "btnDeleteStudent",
@@ -283,7 +277,6 @@ Public Class frmAdminDashboard
         AddHandler txtSearchCashiers.TextChanged, AddressOf txtSearchCashiers_TextChanged
         AddHandler dgvCashiers.CellFormatting, AddressOf dgvCashiers_CellFormatting
 
-        ' Add handlers for the new DataError events
         AddHandler dgvAdmins.DataError, AddressOf dgvAdmins_DataError
         AddHandler dgvCashiers.DataError, AddressOf dgvCashiers_DataError
 
@@ -584,8 +577,14 @@ Public Class frmAdminDashboard
                 Dim query As String = "
                         SELECT
                             q.queue_number,
-                            COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
-                        s.student_number AS StudentNo,
+                            CASE 
+                                WHEN q.visitor_id IS NOT NULL THEN v.full_name
+                                ELSE CONCAT(s.first_name, ' ', s.last_name)
+                            END AS FullName,
+                        CASE 
+                            WHEN q.visitor_id IS NOT NULL THEN 'VISITOR'
+                            ELSE s.student_number
+                        END AS StudentNo,
                         c.counter_name,
                         q.status
                     FROM queues q
@@ -600,7 +599,7 @@ Public Class frmAdminDashboard
                             queueList.Add(New QueueLogItem With {
                                 .QueueNumber = reader("queue_number").ToString(),
                                 .FullName = reader("FullName").ToString(),
-                                .StudentNo = If(reader("StudentNo") IsNot DBNull.Value, reader("StudentNo").ToString(), "N/A"),
+                                .StudentNo = If(reader("StudentNo") IsNot DBNull.Value, reader("StudentNo").ToString(), "VISITOR"),
                                 .Counter = reader("counter_name").ToString(),
                                 .Status = reader("status").ToString()
                             })
@@ -625,7 +624,10 @@ Public Class frmAdminDashboard
                 SELECT
                     q.queue_id,
                     q.queue_number AS 'Queue Number',
-                    COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS 'Full Name',
+                    CASE 
+                        WHEN q.visitor_id IS NOT NULL THEN v.full_name
+                        ELSE CONCAT(s.first_name, ' ', s.last_name)
+                    END AS 'Full Name',
                     q.status AS 'Status',
                     q.created_at AS 'Date Created'
                 FROM queues q
@@ -894,19 +896,21 @@ Public Class frmAdminDashboard
         Using conn As MySqlConnection = DatabaseHelper.GetConnection()
             Try
                 conn.Open()
-                Dim query As String = "SELECT cashier_id, COUNT(*) as ProcessedCount 
+                Dim query As String = "SELECT counter_id, COUNT(*) as ProcessedCount 
                                       FROM queues 
                                       WHERE status = 'completed' AND DATE(created_at) = CURDATE() 
-                                      GROUP BY cashier_id"
+                                      GROUP BY counter_id"
                 Using cmd As New MySqlCommand(query, conn)
                     Using reader As MySqlDataReader = cmd.ExecuteReader()
                         While reader.Read()
-                            processedCounts.Add(Convert.ToInt32(reader("cashier_id")), Convert.ToInt32(reader("ProcessedCount")))
+                            If Not reader.IsDBNull(reader.GetOrdinal("counter_id")) Then
+                                processedCounts.Add(Convert.ToInt32(reader("counter_id")), Convert.ToInt32(reader("ProcessedCount")))
+                            End If
                         End While
                     End Using
                 End Using
             Catch ex As Exception
-                Console.WriteLine($"Error fetching processed queue counts: {ex.Message}")
+                MessageBox.Show($"Error fetching processed queue counts: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End Try
         End Using
 
@@ -915,7 +919,7 @@ Public Class frmAdminDashboard
             Try
                 conn.Open()
                 Dim query As String = "
-                        SELECT csh.cashier_id, csh.full_name, csh.username, csh.last_login
+                        SELECT csh.cashier_id, csh.counter_id, csh.full_name, csh.username, csh.last_login
                         FROM cashiers csh
                         ORDER BY csh.full_name"
                 Using cmd As New MySqlCommand(query, conn)
@@ -923,8 +927,12 @@ Public Class frmAdminDashboard
                         While reader.Read()
                             Dim cashierId As Integer = Convert.ToInt32(reader("cashier_id"))
                             Dim processedToday As Integer = 0
-                            If processedCounts.ContainsKey(cashierId) Then
-                                processedToday = processedCounts(cashierId)
+                            
+                            If Not reader.IsDBNull(reader.GetOrdinal("counter_id")) Then
+                                Dim counterId As Integer = Convert.ToInt32(reader("counter_id"))
+                                If processedCounts.ContainsKey(counterId) Then
+                                    processedToday = processedCounts(counterId)
+                                End If
                             End If
 
                             cashierList.Add(New StaffUser With {
@@ -1361,13 +1369,16 @@ Public Class frmAdminDashboard
                 conn.Open()
                 Dim queryBuilder As New System.Text.StringBuilder("
                     SELECT q.queue_id, q.queue_number,
-                           COALESCE(CONCAT(s.first_name, ' ', s.last_name), v.full_name) AS FullName,
+                           CASE 
+                               WHEN q.visitor_id IS NOT NULL THEN v.full_name
+                               ELSE CONCAT(s.first_name, ' ', s.last_name)
+                           END AS FullName,
                            q.status, q.created_at,
                            c.full_name AS CashierName
                     FROM queues q
                     LEFT JOIN students s ON q.student_id = s.student_id
                     LEFT JOIN visitors v ON q.visitor_id = v.visitor_id
-                    LEFT JOIN cashiers c ON q.cashier_id = c.cashier_id
+                    LEFT JOIN cashiers c ON q.counter_id = c.counter_id
                     WHERE ")
 
                 Dim cmd As New MySqlCommand()
@@ -1548,6 +1559,10 @@ Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellF
             Using frm As New frmAddStudent()
                 frm.ShowDialog(Me)
                 If frm.DialogResult = DialogResult.OK Then
+                    MessageBox.Show("Student added successfully!",
+                                  "Success",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Information)
                     FetchUsers()
                 End If
             End Using
@@ -1562,6 +1577,10 @@ Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellF
             Using frm As New frmBulkAddStudents()
                 frm.ShowDialog(Me)
                 If frm.DialogResult = DialogResult.OK Then
+                    MessageBox.Show("Students added successfully!",
+                                  "Success",
+                                  MessageBoxButtons.OK,
+                                  MessageBoxIcon.Information)
                     FetchUsers()
                 End If
             End Using
@@ -1624,18 +1643,13 @@ Private Sub dgvAllQueues_CellFormatting(sender As Object, e As DataGridViewCellF
         End If
     End Sub
 
-    ' Add these two methods here:
     Private Sub dgvAdmins_DataError(sender As Object, e As DataGridViewDataErrorEventArgs)
-        ' Handle data errors for the admins DataGridView
         Console.WriteLine($"DataGridView Admins Error: {e.Exception.Message}")
-        ' Suppress the error to prevent the application from crashing
         e.ThrowException = False
     End Sub
 
     Private Sub dgvCashiers_DataError(sender As Object, e As DataGridViewDataErrorEventArgs)
-        ' Handle data errors for the cashiers DataGridView
         Console.WriteLine($"DataGridView Cashiers Error: {e.Exception.Message}")
-        ' Suppress the error to prevent the application from crashing
         e.ThrowException = False
     End Sub
 End Class

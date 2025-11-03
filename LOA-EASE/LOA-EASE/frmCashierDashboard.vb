@@ -79,7 +79,7 @@ Public Class frmCashierDashboard
             Try
                 conn.Open()
                 Dim query As String = "
-                    SELECT q.queue_id, q.queue_number, q.purpose,
+                    SELECT q.queue_id, q.queue_number, q.purpose, q.visitor_id,
                            s.student_number, s.first_name, s.last_name, s.course,
                            v.full_name AS visitor_name
                     FROM queues q
@@ -160,12 +160,16 @@ Public Class frmCashierDashboard
         lblServingNumber.Text = reader("queue_number").ToString()
         lblPurpose.Text = $"Purpose of Visit: {reader("purpose")}"
 
-        If Not IsDBNull(reader("student_number")) Then
+        If Not IsDBNull(reader("visitor_id")) Then
+            lblName.Text = $"Name: {reader("visitor_name")}"
+            lblStudentNumber.Text = "Student Number: VISITOR"
+            lblCourse.Text = "Course: N/A"
+        ElseIf Not IsDBNull(reader("student_number")) Then
             lblName.Text = $"Name: {reader("first_name")} {reader("last_name")}"
             lblStudentNumber.Text = $"Student Number: {reader("student_number")}"
             lblCourse.Text = $"Course: {reader("course")}"
         Else
-            lblName.Text = $"Name: {reader("visitor_name")}"
+            lblName.Text = "Name: N/A"
             lblStudentNumber.Text = "Student Number: N/A"
             lblCourse.Text = "Course: N/A"
         End If
